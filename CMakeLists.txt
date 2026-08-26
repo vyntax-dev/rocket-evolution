@@ -13,12 +13,19 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(the-thing src/main.cpp
+add_executable(SFML-thing src/main.cpp
         src/events.cpp
         src/events.h
         src/config.h
+        src/star.h
 )
-target_compile_features(the-thing PRIVATE cxx_std_17)
-target_link_libraries(the-thing PRIVATE SFML::Graphics)
+target_compile_features(SFML-thing PRIVATE cxx_std_17)
+target_link_libraries(SFML-thing PRIVATE SFML::Graphics)
 
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT the-thing)
+add_custom_command(
+        TARGET ${PROJECT_NAME}
+        COMMENT "copy res directory"
+        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res
+)
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT SFML-thing)
