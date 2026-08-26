@@ -13,7 +13,11 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(the-thing src/main.cpp)
+add_executable(the-thing src/main.cpp
+        src/events.cpp
+        src/events.h
+        src/config.h
+)
 target_compile_features(the-thing PRIVATE cxx_std_17)
 target_link_libraries(the-thing PRIVATE SFML::Graphics)
 
