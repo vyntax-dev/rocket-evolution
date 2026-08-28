@@ -9,7 +9,6 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 
-struct Star {
+struct Rocket {
     sf::Vector2f pos;
-    mutable float z = 1.0f;
 };
