@@ -34,7 +34,8 @@ struct Rocket {
     void calculateFitness(const sf::Vector2f &target) {
         const float dx = position.x - target.x;
         const float dy = position.y - target.y;
-        fitness = sqrtf(dx * dx + dy * dy);
+        const float distance = sqrtf(dx*dx + dy*dy);
+        fitness = 1 / distance;
     }
 };
 
