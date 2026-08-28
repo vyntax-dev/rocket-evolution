@@ -15,11 +15,10 @@ namespace conf {
     constexpr sf::Color bgColor{2, 2, 10};
 
     // Rocket config
-    constexpr uint32_t count = 1;
+    constexpr uint32_t count = 100;
     constexpr float scale = 20.0f;
-    constexpr float far = 10.0f;
-    constexpr float near = 0.01f;
-    constexpr float speed = 5.0f;
+    constexpr float maxForce = 0.1f;
+    constexpr uint32_t lifespan = 500;
     constexpr int vertexCount = 3;
     constexpr sf::Color color{250,128,114};
 }

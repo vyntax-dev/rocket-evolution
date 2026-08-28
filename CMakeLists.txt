@@ -18,6 +18,7 @@ add_executable(rockets src/main.cpp
         src/events.h
         src/config.h
         src/rocket.h
+        src/genome.h
 )
 target_compile_features(rockets PRIVATE cxx_std_17)
 target_link_libraries(rockets PRIVATE SFML::Graphics)
