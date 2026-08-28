@@ -31,9 +31,9 @@ struct Rocket {
         acceleration = {0, 0};
     }
 
-    void calculateFitness(const float &targetX, const float &targetY) {
-        const float dx = position.x - targetX;
-        const float dy = position.y - targetY;
+    void calculateFitness(const sf::Vector2f &target) {
+        const float dx = position.x - target.x;
+        const float dy = position.y - target.y;
         fitness = sqrtf(dx * dx + dy * dy);
     }
 };
