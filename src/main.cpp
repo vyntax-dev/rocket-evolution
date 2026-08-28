@@ -10,7 +10,7 @@ using namespace std;
 void processGeometry(VertexArray& va, const int &idx, const Rocket &rocket) {
 
 	const uint32_t i = conf::vertexCount * idx;
-	const Vector2f p = rocket.pos;
+	const Vector2f p = rocket.position;
 	va[i+0].position = Vector2f(p.x, p.y);
 	va[i+1].position = Vector2f(p.x - conf::scale, p.y + conf::scale*2);
 	va[i+2].position = Vector2f(p.x + conf::scale, p.y + conf::scale*2);
@@ -23,12 +23,13 @@ void processGeometry(VertexArray& va, const int &idx, const Rocket &rocket) {
 int main()
 {
 	RenderWindow window( VideoMode( conf::windowSize ), "stars ooga booga", Style::None );
+	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(conf::framerate);
 
 	VertexArray va{PrimitiveType::Triangles, conf::vertexCount * conf::count};
-	const vector<Rocket> rockets(conf::count, {{0.f, 0.f}});
+	 vector<Rocket> rockets(conf::count, Rocket(0, 0));
 
-	Vector2f offset{0, 0};
+	Angle rotation;
 	while ( window.isOpen() )
 	{
 		processEvents( window);
@@ -43,18 +44,25 @@ int main()
 		}
 
 		// Moving it
-		if (Keyboard::isKeyPressed(Keyboard::Key::A))
-			offset.x -= conf::speed;
-		if (Keyboard::isKeyPressed(Keyboard::Key::D))
-			offset.x += conf::speed;
-		if (Keyboard::isKeyPressed(Keyboard::Key::W))
-			offset.y -= conf::speed;
-		if (Keyboard::isKeyPressed(Keyboard::Key::S))
-			offset.y += conf::speed;
+		for (int i = 0; i < conf::count; i++) {
+			auto &rocket = rockets[i];
+			if (Keyboard::isKeyPressed(Keyboard::Key::A)) {
+				rotation = degrees(-90);
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Key::D)) {
+				rotation = degrees(90);
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Key::W)) {
+				rotation = degrees(0);
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Key::S)) {
+				rotation = degrees(180);
+			}
+		}
 
 		RenderStates states;
-		states.transform.translate(conf::windowSizeF * 0.5f + offset);
-		states.transform.rotate(degrees(180));
+		states.transform.translate(conf::windowSizeF * 0.5f);
+		states.transform.rotate(rotation);
 		window.draw(va, states);
 
 		window.display();
