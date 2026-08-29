@@ -16,9 +16,11 @@ namespace conf {
 
     // Rocket config
     constexpr uint32_t count = 100;
+    constexpr uint32_t lifespan = 500;
     constexpr float scale = 20.0f;
     constexpr float maxForce = 0.1f;
-    constexpr uint32_t lifespan = 500;
+    constexpr float mutationRate = 0.01f;
     constexpr int vertexCount = 3;
     constexpr sf::Color color{250,128,114};
+    constexpr sf::Vector2f spawnOrigin{320, 220};
 }

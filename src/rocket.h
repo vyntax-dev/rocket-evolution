@@ -7,6 +7,7 @@
 
 #include "SFML/System/Vector2.hpp"
 #include "genome.h"
+#include "random"
 
 
 struct Rocket {
@@ -17,9 +18,9 @@ struct Rocket {
     Genome genome;
     uint32_t geneCounter;
 
-    Rocket(const float &x, const float &y, const Genome &genome) : genome(genome) {
+    explicit Rocket(const Genome &genome) : genome(genome) {
         this->genome = genome;
-        position = {x, y};
+        position = conf::spawnOrigin;
         velocity = {0, 0};
         acceleration = {0, 0};
         fitness = 0;
@@ -51,15 +52,13 @@ struct Rocket {
 };
 
 struct Population {
-    float mutationRate;
     vector<Rocket> population;
     uint32_t generations;
-    explicit Population(const float &mutation) {
-      mutationRate = mutation;
+    explicit Population() {
       generations = 0;
       population.reserve(conf::count);
       for (uint32_t i = 0; i < conf::count; i++) {
-          population[i] = Rocket(320, 220, Genome(conf::lifespan));
+          population[i] = Rocket(Genome());
       }
     }
 
@@ -80,10 +79,24 @@ struct Population {
     }
 
     void breed() {
+        // Weighted selection via discrete distribution
+        static random_device rd;
+        static mt19937 gen(rd());
+        vector<float> weights;
+        for (const Rocket& rocket : population) weights.push_back(rocket.fitness + 0.0001f);
+        discrete_distribution<> distrib(weights.begin(), weights.end());
+
+        // make the new population or smth
         vector<Rocket> newPopulation;
+        newPopulation.reserve(conf::count);
         for (uint32_t i = 0; i < conf::count; i++) {
-            //Rocket parentA = weighted selection()
+            const Rocket &parentA = population[distrib(gen)];
+            const Rocket &parentB = population[distrib(gen)];
+
+            const Rocket child = Rocket{parentA.genome.breed(parentB.genome)};
+            newPopulation[i] = child;
         }
+        population = newPopulation;
     }
 };
 
