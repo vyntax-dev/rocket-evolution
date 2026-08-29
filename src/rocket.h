@@ -98,6 +98,12 @@ struct Population {
         }
         population = newPopulation;
     }
+
+    void live() {
+        for (auto &rocket : population) {
+            rocket.run();
+        }
+    }
 };
 
 #endif //ROCKETS_ROCKET_H

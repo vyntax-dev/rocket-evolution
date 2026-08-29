@@ -27,9 +27,7 @@ int main()
 	window.setFramerateLimit(conf::framerate);
 
 	VertexArray va{PrimitiveType::Triangles, conf::vertexCount * conf::count};
-	 vector<Rocket> rockets(conf::count, Rocket(0, 0));
 
-	Angle rotation;
 	while ( window.isOpen() )
 	{
 		processEvents( window);
@@ -38,31 +36,11 @@ int main()
 		// Rendering
 		window.clear(conf::bgColor);
 
-		for (int i = 0; i < conf::count; i++) {
-			Rocket rocket = rockets[i];
-			processGeometry(va, i, rocket);
-		}
-
 		// Moving it
-		for (int i = 0; i < conf::count; i++) {
-			auto &rocket = rockets[i];
-			if (Keyboard::isKeyPressed(Keyboard::Key::A)) {
-				rotation = degrees(-90);
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Key::D)) {
-				rotation = degrees(90);
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Key::W)) {
-				rotation = degrees(0);
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Key::S)) {
-				rotation = degrees(180);
-			}
-		}
+
 
 		RenderStates states;
 		states.transform.translate(conf::windowSizeF * 0.5f);
-		states.transform.rotate(rotation);
 		window.draw(va, states);
 
 		window.display();
