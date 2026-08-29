@@ -5,9 +5,7 @@
 #ifndef ROCKETS_ROCKET_H
 #define ROCKETS_ROCKET_H
 
-#include "SFML/System/Vector2.hpp"
 #include "genome.h"
-#include "random"
 
 
 struct Rocket {
@@ -55,10 +53,10 @@ struct Population {
     vector<Rocket> population;
     uint32_t generations;
     explicit Population() {
-      generations = 0;
+      generations = 1;
       population.reserve(conf::count);
       for (uint32_t i = 0; i < conf::count; i++) {
-          population[i] = Rocket(Genome());
+          population.emplace_back(Genome());
       }
     }
 
@@ -83,6 +81,7 @@ struct Population {
         static random_device rd;
         static mt19937 gen(rd());
         vector<float> weights;
+        weights.reserve(conf::count);
         for (const Rocket& rocket : population) weights.push_back(rocket.fitness + 0.0001f);
         discrete_distribution<> distrib(weights.begin(), weights.end());
 
@@ -93,10 +92,11 @@ struct Population {
             const Rocket &parentA = population[distrib(gen)];
             const Rocket &parentB = population[distrib(gen)];
 
-            const Rocket child = Rocket{parentA.genome.breed(parentB.genome)};
-            newPopulation[i] = child;
+            Rocket child = Rocket(parentA.genome.breed(parentB.genome));
+            child.genome.mutate();
+            newPopulation.push_back(child);
         }
-        population = newPopulation;
+        population = std::move(newPopulation);
     }
 
     void live() {

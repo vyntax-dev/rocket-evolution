@@ -11,18 +11,19 @@
 using namespace std;
 
 struct Genome {
-    std::vector<sf::Vector2f> genes;
+    vector<sf::Vector2f> genes;
     float maxForce = conf::maxForce;
 
     explicit Genome() {
+        genes.reserve(conf::lifespan);
 
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        std::uniform_real_distribution<> distrib(-1, 1);
-        std::uniform_real_distribution<> distrib2(0, maxForce);
+        static random_device rd;
+        static mt19937 gen(rd());
+        uniform_real_distribution<> distrib(-1, 1);
+        uniform_real_distribution<> distrib2(0, maxForce);
         for (int i = 0; i < conf::lifespan; i++) {
-            genes[i] = {static_cast<float>(distrib(gen)),
-                                static_cast<float>(distrib(gen))};
+            genes.emplace_back(static_cast<float>(distrib(gen)),
+                                static_cast<float>(distrib(gen)));
             genes[i] = genes[i].normalized();
 
             // multiply by random number up to max force
@@ -35,14 +36,32 @@ struct Genome {
 
         static random_device rd;
         static mt19937 gen(rd());
-        uniform_int_distribution<> distrib(0, 2);
+        uniform_int_distribution<> distrib(0, conf::lifespan - 1);
         const int until = distrib(gen);
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < conf::lifespan; i++) {
             if (i < until) child.genes[i] = this->genes[i];
             else child.genes[i] = mate.genes[i];
         }
         return child;
+    }
+
+    void mutate() {
+        static random_device rd;
+        static mt19937 gen(rd());
+        uniform_real_distribution<> distrib(0, 1); // Mutation chance
+        uniform_real_distribution<> distrib2(-1, 1); // Randomize gene
+        uniform_real_distribution<> distrib3(0, maxForce); // Mult by up to max force
+
+        for (int i = 0; i < conf::lifespan; i++) {
+            if (distrib(gen) < conf::mutationRate) {
+                genes[i] = sf::Vector2f{static_cast<float>(distrib2(gen)),
+                                static_cast<float>(distrib2(gen))};
+                genes[i] = genes[i].normalized();
+
+                genes[i] *= static_cast<float>(distrib3(gen));
+            }
+        }
     }
 };
 #endif //ROCKETS_GENOME_H
