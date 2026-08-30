@@ -13,6 +13,7 @@ struct Rocket {
     sf::Vector2f position;
     sf::Vector2f velocity;
     sf::Vector2f acceleration;
+    sf::Angle angle;
     float fitness;
     Genome genome;
     uint32_t geneCounter;
@@ -26,6 +27,7 @@ struct Rocket {
         position = conf::spawnOrigin;
         velocity = {0, 0};
         acceleration = {0, 0};
+        angle = sf::degrees(0);
         fitness = 0;
         geneCounter = 0;
         hitObstacle = false;
@@ -41,6 +43,7 @@ struct Rocket {
     void update() {
         velocity += acceleration;
         position += velocity;
+        angle = velocity.angle();
         acceleration = {0, 0};
     }
 

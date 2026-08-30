@@ -9,13 +9,25 @@ void processGeometry(VertexArray& va, const uint32_t &idx, const Rocket &rocket)
 
 	const uint32_t i = conf::vertexCount * idx;
 	const Vector2f p = rocket.position;
-	va[i+0].position = Vector2f(p.x, p.y);
-	va[i+1].position = Vector2f(p.x - conf::scale, p.y + conf::scale*2);
-	va[i+2].position = Vector2f(p.x + conf::scale, p.y + conf::scale*2);
 
-	va[i+0].color = conf::color;
-	va[i+1].color = conf::color;
-	va[i+2].color = conf::color;
+	constexpr Vector2f local[3] = {
+		{0.f, -conf::scale * 2},          // nose
+		{-conf::scale, conf::scale},      // back-left
+		{conf::scale, conf::scale}        // back-right
+	};
+
+	const float rad = (rocket.angle + degrees(90)).asRadians();
+	const float c = cos(rad);
+	const float s = sin(rad);
+
+	for (int k = 0; k < 3; k++) {
+		const Vector2f rotated{
+			local[k].x * c - local[k].y * s,
+			local[k].x * s + local[k].y * c
+		};
+		va[i + k].position = p + rotated;
+		va[i + k].color = conf::color;
+	}
 }
 
 int main()
@@ -24,22 +36,26 @@ int main()
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(conf::framerate);
 
+	// Initialize target
 	Obstacle target{conf::targetOrigin, conf::targetWidth, conf::targetHeight};
 	RectangleShape targetShape{{target.width, target.height}};
 	targetShape.setFillColor(conf::targetColor);
 	targetShape.setPosition(target.position);
 
+	// Initialize obstacle
 	Obstacle obstacle{conf::obstacleOrigin, conf::obstacleWidth, conf::obstacleHeight};
 	RectangleShape obstacleShape{{obstacle.width, obstacle.height}};
 	obstacleShape.setFillColor(conf::obstacleColor);
 	obstacleShape.setPosition(obstacle.position);
 
+	// Initialize text
 	const Font font("res/Oswald.ttf");
 	Text text(font);
 	text.setCharacterSize(24);
 	text.setFillColor(Color::White);
 	text.setStyle(Text::Bold);
 
+	// Initialize rockets
 	VertexArray va{PrimitiveType::Triangles, conf::vertexCount * conf::count};
 	Population rockets{};
 	uint32_t lifeCounter = 0;
