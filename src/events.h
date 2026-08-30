@@ -9,4 +9,4 @@
 
 #include <SFML/Window.hpp>
 
-void processEvents(sf::Window& window);
+float processEvents(sf::Window &window);

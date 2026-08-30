@@ -59,10 +59,10 @@ struct Rocket {
     }
 
     void calculateFitness() {
-        fitness = 1 / (static_cast<float>(finishCounter) * recordDistance);
+        fitness = 1 / (static_cast<float>(finishCounter*20) * (recordDistance + 0.001f));
         fitness = static_cast<float>(pow(fitness, 4));
 
-        if (hitObstacle) fitness *= 0.1f;
+        if (hitObstacle) fitness *= 0.01f;
         if (hitTarget) fitness *= 2.f;
     }
 

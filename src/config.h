@@ -16,7 +16,7 @@ namespace conf {
     constexpr uint32_t count = 100;
     constexpr uint32_t lifespan = 250;
     constexpr float scale = 20.0f;
-    constexpr float maxForce = 0.3f;
+    constexpr float maxForce = 1.f;
     constexpr float mutationRate = 0.01f;
     constexpr int vertexCount = 3;
     constexpr sf::Color color{250,128,114, 50};

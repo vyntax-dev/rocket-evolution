@@ -1,3 +1,4 @@
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include "events.h"
 #include "rocket.h"
@@ -37,16 +38,16 @@ int main()
 	window.setFramerateLimit(conf::framerate);
 
 	// Initialize target
-	Obstacle target{conf::targetOrigin, conf::targetWidth, conf::targetHeight};
+	Obstacle target{{0, 0}, conf::targetWidth, conf::targetHeight};
 	RectangleShape targetShape{{target.width, target.height}};
 	targetShape.setFillColor(conf::targetColor);
-	targetShape.setPosition(target.position);
+	targetShape.setOrigin({target.width / 2, target.height / 2});
 
 	// Initialize obstacle
-	Obstacle obstacle{conf::obstacleOrigin, conf::obstacleWidth, conf::obstacleHeight};
+	Obstacle obstacle{{0, 0}, conf::obstacleWidth, conf::obstacleHeight};
 	RectangleShape obstacleShape{{obstacle.width, obstacle.height}};
 	obstacleShape.setFillColor(conf::obstacleColor);
-	obstacleShape.setPosition(obstacle.position);
+	obstacleShape.setOrigin({obstacle.width / 2, obstacle.height / 2});
 
 	// Initialize text
 	const Font font("res/Oswald.ttf");
@@ -60,8 +61,10 @@ int main()
 	Population rockets{};
 	uint32_t lifeCounter = 0;
 
+	Angle rotation = degrees(0);
 	while ( window.isOpen() ) {
-		processEvents( window);
+
+		const float k = processEvents(window);
 
 		if (window.hasFocus()) {
 			if (Mouse::isButtonPressed(Mouse::Button::Left)) {
@@ -72,6 +75,9 @@ int main()
 				obstacle.position = static_cast<Vector2f>(Mouse::getPosition());
 				obstacleShape.setPosition(obstacle.position);
 			}
+			rotation += degrees(k);
+			obstacleShape.setRotation(rotation);
+			obstacle.rotation = rotation;
 		}
 
 		uint32_t bestRocketIdx = 0;
@@ -81,7 +87,9 @@ int main()
 			text.setString(
 				"Generation #: " + to_string(rockets.generations) +
 				"\nCycles left until sacrifice: " + to_string(conf::lifespan - lifeCounter)
-				+ "\n\n(Left click to set target position)");
+				+ "\n\n(Left click to set target position)"
+				+ "\n(Right click to set obstacle position)"
+				+ "\n(Scroll to rotate obstacle)");
 		}
 		else {
 			lifeCounter = 0;
@@ -96,10 +104,10 @@ int main()
 		for ( int i = 0; i < conf::count; ++i ) {
 			processGeometry(va, i, rockets.population[i]);
 		}
-
+		window.draw(va);
 		window.draw(targetShape);
 		window.draw(obstacleShape);
-		window.draw(va);
+
 		window.draw(text);
 
 		window.display();
