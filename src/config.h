@@ -23,7 +23,14 @@ namespace conf {
     constexpr sf::Vector2f spawnOrigin{320, 220};
 
     // Target config
-    constexpr float radius = 20.0f;
+    constexpr float targetWidth = 50.0f;
+    constexpr float targetHeight = 50.0f;
     constexpr sf::Color targetColor{50,150,50};
     constexpr sf::Vector2f targetOrigin{600, 500};
+
+    // Obstacle config
+    constexpr float obstacleWidth = 300.0f;
+    constexpr float obstacleHeight = 20.0f;
+    constexpr sf::Color obstacleColor{50,50,50};
+    constexpr sf::Vector2f obstacleOrigin{400,320};
 }

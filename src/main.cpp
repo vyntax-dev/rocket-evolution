@@ -24,9 +24,15 @@ int main()
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(conf::framerate);
 
-	CircleShape target{conf::radius};
-	target.setFillColor(conf::targetColor);
-	target.setPosition(conf::targetOrigin);
+	Obstacle target{conf::targetOrigin, conf::targetWidth, conf::targetHeight};
+	RectangleShape targetShape{{target.width, target.height}};
+	targetShape.setFillColor(conf::targetColor);
+	targetShape.setPosition(target.position);
+
+	Obstacle obstacle{conf::obstacleOrigin, conf::obstacleWidth, conf::obstacleHeight};
+	RectangleShape obstacleShape{{obstacle.width, obstacle.height}};
+	obstacleShape.setFillColor(conf::obstacleColor);
+	obstacleShape.setPosition(obstacle.position);
 
 	const Font font("res/Oswald.ttf");
 	Text text(font);
@@ -42,14 +48,20 @@ int main()
 		processEvents( window);
 
 		if (window.hasFocus()) {
-			if (Mouse::isButtonPressed(Mouse::Button::Left))
-				target.setPosition(static_cast<Vector2f>(Mouse::getPosition()));
+			if (Mouse::isButtonPressed(Mouse::Button::Left)) {
+				target.position = static_cast<Vector2f>(Mouse::getPosition());
+				targetShape.setPosition(target.position);
+			}
+			if (Mouse::isButtonPressed(Mouse::Button::Right)) {
+				obstacle.position = static_cast<Vector2f>(Mouse::getPosition());
+				obstacleShape.setPosition(obstacle.position);
+			}
 		}
 
 		uint32_t bestRocketIdx = 0;
 		if (lifeCounter < conf::lifespan) {
 			lifeCounter++;
-			rockets.live();
+			rockets.live(obstacle, target);
 			text.setString(
 				"Generation #: " + to_string(rockets.generations) +
 				"\nCycles left until sacrifice: " + to_string(conf::lifespan - lifeCounter)
@@ -57,7 +69,7 @@ int main()
 		}
 		else {
 			lifeCounter = 0;
-			rockets.fitness(target.getPosition());
+			rockets.fitness();
 			rockets.selection();
 			rockets.breed();
 			rockets.generations++;
@@ -69,8 +81,9 @@ int main()
 			processGeometry(va, i, rockets.population[i]);
 		}
 
+		window.draw(targetShape);
+		window.draw(obstacleShape);
 		window.draw(va);
-		window.draw(target);
 		window.draw(text);
 
 		window.display();

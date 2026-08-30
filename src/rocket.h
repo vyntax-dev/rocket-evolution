@@ -6,6 +6,7 @@
 #define ROCKETS_ROCKET_H
 
 #include "genome.h"
+#include "obstacle.h"
 
 
 struct Rocket {
@@ -15,6 +16,10 @@ struct Rocket {
     float fitness;
     Genome genome;
     uint32_t geneCounter;
+    bool hitObstacle;
+    bool hitTarget;
+    float recordDistance;
+    uint32_t finishCounter;
 
     explicit Rocket(const Genome &genome) : genome(genome) {
         this->genome = genome;
@@ -23,6 +28,10 @@ struct Rocket {
         acceleration = {0, 0};
         fitness = 0;
         geneCounter = 0;
+        hitObstacle = false;
+        hitTarget = false;
+        recordDistance = 3e38f;
+        finishCounter = 0;
     }
 
     void applyForce(const sf::Vector2f &force) {
@@ -35,17 +44,41 @@ struct Rocket {
         acceleration = {0, 0};
     }
 
-    void run() {
-        applyForce(genome.genes[geneCounter]);
-        geneCounter++;
-        update();
+    void run(const Obstacle &obstacle, const Obstacle &target) {
+        if (!hitObstacle && !hitTarget) {
+            applyForce(genome.genes[geneCounter]);
+            geneCounter++;
+            update();
+
+            checkObstacles(obstacle);
+            checkTarget(target);
+        }
     }
 
-    void calculateFitness(const sf::Vector2f &target) {
-        const float dx = position.x - target.x;
-        const float dy = position.y - target.y;
-        const float distance = dx*dx + dy*dy;
-        fitness = 1 / distance;
+    void calculateFitness() {
+        fitness = 1 / (static_cast<float>(finishCounter) * recordDistance);
+        fitness = static_cast<float>(pow(fitness, 4));
+
+        if (hitObstacle) fitness *= 0.1f;
+        if (hitTarget) fitness *= 2.f;
+    }
+
+    void checkObstacles(const Obstacle &obstacle) {
+        if (obstacle.contains(position)) {
+            hitObstacle = true;
+        }
+    }
+
+    void checkTarget(const Obstacle &target) {
+        const float dx = position.x - target.position.x;
+        const float dy = position.y - target.position.y;
+        if (const float distance = sqrt(dx*dx + dy*dy); distance < recordDistance) {
+            recordDistance = distance;
+        }
+
+        if (target.contains(position))
+            hitTarget = true;
+        else finishCounter++;
     }
 };
 
@@ -60,9 +93,9 @@ struct Population {
       }
     }
 
-    void fitness(const sf::Vector2f &target) {
+    void fitness() {
         for (auto &rocket : population) {
-            rocket.calculateFitness(target);
+            rocket.calculateFitness();
         }
     }
 
@@ -99,9 +132,9 @@ struct Population {
         population = std::move(newPopulation);
     }
 
-    void live() {
+    void live(const Obstacle &obstacle, const Obstacle &target) {
         for (auto &rocket : population) {
-            rocket.run();
+            rocket.run(obstacle, target);
         }
     }
 };
