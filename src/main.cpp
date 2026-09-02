@@ -36,15 +36,16 @@ int main()
 	RenderWindow window( VideoMode( VideoMode::getDesktopMode().size ), "stars ooga booga", Style::None );
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(conf::framerate);
+	conf::read(); // Grabs config from settings.cfg
 
 	// Initialize target
-	Obstacle target{{0, 0}, conf::targetWidth, conf::targetHeight};
+	Obstacle target{{-5000, -5000}, conf::targetWidth, conf::targetHeight};
 	RectangleShape targetShape{{target.width, target.height}};
 	targetShape.setFillColor(conf::targetColor);
 	targetShape.setOrigin({target.width / 2, target.height / 2});
 
 	// Initialize obstacle
-	Obstacle obstacle{{0, 0}, conf::obstacleWidth, conf::obstacleHeight};
+	Obstacle obstacle{{-5000, -5000}, conf::obstacleWidth, conf::obstacleHeight};
 	RectangleShape obstacleShape{{obstacle.width, obstacle.height}};
 	obstacleShape.setFillColor(conf::obstacleColor);
 	obstacleShape.setOrigin({obstacle.width / 2, obstacle.height / 2});
@@ -89,7 +90,8 @@ int main()
 				"\nCycles left until sacrifice: " + to_string(conf::lifespan - lifeCounter)
 				+ "\n\n(Left click to set target position)"
 				+ "\n(Right click to set obstacle position)"
-				+ "\n(Scroll to rotate obstacle)");
+				+ "\n(Scroll to rotate obstacle)"
+				+ "\n\nEsc to close app");
 		}
 		else {
 			lifeCounter = 0;

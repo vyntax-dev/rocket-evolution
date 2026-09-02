@@ -22,6 +22,7 @@ add_executable(rockets src/main.cpp
         src/rocket.h
         src/genome.h
         src/obstacle.h
+        src/roundedRectangles.h
 )
 target_compile_features(rockets PRIVATE cxx_std_17)
 target_link_libraries(rockets PRIVATE SFML::Graphics)
